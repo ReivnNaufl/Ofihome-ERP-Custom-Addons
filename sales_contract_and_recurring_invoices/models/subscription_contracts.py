@@ -127,8 +127,9 @@ class SubscriptionContracts(models.Model):
         
     def action_generate_recurring_invoice(self):
         """Generate recurring invoice and update next_invoice_date"""
+        today = fields.Date.today()
         for contract in self:
-            if contract.state not in ['Cancelled', 'Expired']:
+            if contract.state not in ['Cancelled', 'Expired'] and contract.next_invoice_date and contract.next_invoice_date <= today:
                 invoice = self.env['account.move'].create({
                     'move_type': 'out_invoice',
                     'partner_id': contract.partner_id.id,
