@@ -44,7 +44,8 @@ class ProjectTask(models.Model):
                     user = emp.user_id
                     task_count = self.search_count([
                         ('user_ids', 'in', user.id),
-                        ('stage_id.fold', '=', False)
+                        ('stage_id.fold', '=', False),
+                        ('stage_id.name', 'not in', ['Done', 'Cancelled'])
                     ])
 
                     if task_count >= 3:

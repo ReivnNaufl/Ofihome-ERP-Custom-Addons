@@ -124,6 +124,39 @@ class SubscriptionContracts(models.Model):
             })
         self.invoice_count = self.env['account.move'].search_count([
             ('contract_origin', '=', self.id)])
+        
+    def action_generate_recurring_invoice(self):
+        """Generate recurring invoice and update next_invoice_date"""
+        for contract in self:
+            if contract.state not in ['Cancelled', 'Expired']:
+                invoice = self.env['account.move'].create({
+                    'move_type': 'out_invoice',
+                    'partner_id': contract.partner_id.id,
+                    'invoice_date': fields.Date.today(),
+                    'contract_origin': contract.id,
+                    'currency_id': contract.currency_id.id,
+                    'invoice_user_id': self.env.user.id,
+                    'company_id': contract.company_id.id,
+                    'invoice_line_ids': [
+                        (0, 0, {
+                            'product_id': line.product_id.id,
+                            'name': line.description,
+                            'quantity': line.qty_ordered,
+                            'price_unit': line.price_unit,
+                            'tax_ids': [(6, 0, line.tax_ids.ids)],
+                            'discount': line.discount,
+                        }) for line in contract.contract_line_ids
+                    ]
+                })
+                # Update next_invoice_date
+                if contract.recurring_invoice:
+                    contract.next_invoice_date = date_utils.add(
+                        contract.next_invoice_date or fields.Date.today(),
+                        days=int(contract.recurring_invoice)
+                    )
+                contract.invoice_count = self.env['account.move'].search_count([
+                    ('contract_origin', '=', contract.id)
+                ])
 
     def action_lock(self):
         """ Lock subscription contract """
