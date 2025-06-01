@@ -4,6 +4,7 @@ import math
 class ProjectTask(models.Model):
     _inherit = 'project.task'
 
+    # Harversine formula untuk menarik garis terpendek antara 2 titik koordinat di bumi
     def _haversine(self, lat1, lon1, lat2, lon2):
         R = 6371
         phi1 = math.radians(lat1)
@@ -15,6 +16,7 @@ class ProjectTask(models.Model):
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
         return R * c
 
+    # Auto assign saat create task
     @api.model
     def create(self, vals):
         task = super().create(vals)
@@ -45,9 +47,10 @@ class ProjectTask(models.Model):
                     task_count = self.search_count([
                         ('user_ids', 'in', user.id),
                         ('stage_id.fold', '=', False),
-                        ('stage_id.name', 'not in', ['Done', 'Cancelled'])
+                        ('stage_id.name', 'not in', ['Done', 'Cancelled']) # Ambil open task saja
                     ])
 
+                    # Task lebih dari atau sama dengan 3 -> skip
                     if task_count >= 3:
                         continue
 

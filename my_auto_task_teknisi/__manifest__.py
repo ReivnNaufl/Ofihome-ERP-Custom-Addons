@@ -2,7 +2,7 @@
     'name': 'Auto Assign Teknisi to Task',
     'version': '1.0',
     'depends': ['project', 'sale_management', 'hr', 'base'],
-    'author': 'ChatGPT - OpenAI',
+    'author': 'yuzid, reivnnaufl',
     'category': 'Services',
     'summary': 'Automatically assigns Teknisi employee with lowest workload to new tasks',
     'description': """

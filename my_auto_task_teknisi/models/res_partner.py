@@ -5,3 +5,4 @@ class ResPartner(models.Model):
 
     x_latitude = fields.Float(string='Latitude', digits=(16, 5))
     x_longitude = fields.Float(string='Longitude', digits=(16, 5))
+    
