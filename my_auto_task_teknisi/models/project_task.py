@@ -29,7 +29,7 @@ class ProjectTask(models.Model):
             cust_lon = customer.x_longitude
 
             if not (cust_lat and cust_lon):
-                return task 
+                return task
 
             teknisi_job = self.env['hr.job'].search([('name', 'ilike', 'Teknisi')], limit=1)
             if teknisi_job:
@@ -47,7 +47,7 @@ class ProjectTask(models.Model):
                     task_count = self.search_count([
                         ('user_ids', 'in', user.id),
                         ('stage_id.fold', '=', False),
-                        ('stage_id.name', 'not in', ['Done', 'Cancelled']) # Ambil open task saja
+                        ('stage_id.name', 'not in', ['Done', 'Cancelled'])
                     ])
 
                     # Task lebih dari atau sama dengan 3 -> skip
@@ -59,24 +59,19 @@ class ProjectTask(models.Model):
                     tech_lon = partner.x_longitude
 
                     if tech_lat and tech_lon:
-                        distance = self._haversine(
-                            cust_lat,
-                            cust_lon,
-                            tech_lat,
-                            tech_lon
-                        )
+                        distance = self._haversine(cust_lat, cust_lon, tech_lat, tech_lon)
                         teknisi_list.append((emp, task_count, distance))
                     else:
                         fallback_teknisi_list.append((emp, task_count))
 
                 if teknisi_list:
-                    sorted_teknisi = sorted(teknisi_list, key=lambda x: (x[1], x[2]))
+                    sorted_teknisi = sorted(teknisi_list, key=lambda x: x[2])
                     best_teknisi = sorted_teknisi[0][0]
                 elif fallback_teknisi_list:
                     sorted_fallback = sorted(fallback_teknisi_list, key=lambda x: x[1])
                     best_teknisi = sorted_fallback[0][0]
                 else:
-                    return task 
+                    return task
 
                 if best_teknisi.user_id:
                     task.user_ids = [(4, best_teknisi.user_id.id)]
