@@ -27,7 +27,7 @@ class ProjectTask(models.Model):
             cust_lon = customer.x_longitude
 
             if not (cust_lat and cust_lon):
-                return task  # Cannot proceed without customer coordinates
+                return task 
 
             teknisi_job = self.env['hr.job'].search([('name', 'ilike', 'Teknisi')], limit=1)
             if teknisi_job:
@@ -46,6 +46,9 @@ class ProjectTask(models.Model):
                         ('user_ids', 'in', user.id),
                         ('stage_id.fold', '=', False)
                     ])
+
+                    if task_count >= 3:
+                        continue
 
                     partner = emp.work_contact_id
                     tech_lat = partner.x_latitude
@@ -69,7 +72,7 @@ class ProjectTask(models.Model):
                     sorted_fallback = sorted(fallback_teknisi_list, key=lambda x: x[1])
                     best_teknisi = sorted_fallback[0][0]
                 else:
-                    return task  # No available technicians
+                    return task 
 
                 if best_teknisi.user_id:
                     task.user_ids = [(4, best_teknisi.user_id.id)]
